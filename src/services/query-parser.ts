@@ -137,10 +137,19 @@ function getLimit(query: StringQuery): number {
 
 function getNumberValue(query: StringQuery, keyword: string): number {
   const queryValue = query[keyword];
+  if (Array.isArray(queryValue)) {
+    throw new Error(
+      `Dupplicated value for ${keyword}, please check your query`,
+    );
+  }
+
   //Only the last skip value takes effect
-  const value = Number(
-    Array.isArray(queryValue) ? queryValue[queryValue.length - 1] : queryValue,
-  );
+  const value = Number(queryValue);
+  if (!value && queryValue) {
+    throw new Error(
+      `${keyword} value is not a number, please check your query`,
+    );
+  }
   return value;
 }
 

@@ -7,5 +7,5 @@ test("default root route", async (t) => {
   const res = await app.inject({
     url: "/",
   });
-  t.same(JSON.parse(res.payload), { message: "Hello world from SwiftCloud" });
+  t.same(JSON.parse(res.payload), { message: "Welcome to SwiftCloud" });
 });

@@ -135,6 +135,30 @@ test("Query with filter using all operators with different cases, parse correctl
   });
 });
 
+test("Query with filter with same key params, parse correctly", async (t) => {
+  const query = createQuery("Field1=value1&Field1=value3");
+
+  t.throws(
+    function () {
+      parseQuery(query as StringQuery);
+    },
+    new Error("field1 cannot have multiple value, please check your query"),
+    "should throw error for dupplicated filter value",
+  );
+});
+
+test("Query with filter with same key params scenario2, parse correctly", async (t) => {
+  const query = createQuery("Field1=value1&field1>=100&Field1<10");
+
+  t.throws(
+    function () {
+      parseQuery(query as StringQuery);
+    },
+    new Error("field1 cannot have multiple value, please check your query"),
+    "should throw error for dupplicated filter value",
+  );
+});
+
 /**Testing full query */
 /* Testing data casting */
 

@@ -71,13 +71,14 @@ function getFilter(
   const result = Object.keys(query)
     .filter((key) => !keywordsToExclude.includes(key))
     .reduce<Record<string, unknown>>((result, key) => {
-      const queryVals = query[key];
-      //TODO: handle array with diff key, eg: Author=a,Author!=b --> still a valid query ?
-      const singleQueryVal = Array.isArray(queryVals)
-        ? queryVals[0]
-        : queryVals;
-      const fullVal = `${key}${singleQueryVal ? "=" : ""}${singleQueryVal}`;
-      const valArrays = fullVal.match(filterRegex);
+      const queryVal = query[key];
+      if (Array.isArray(queryVal)) {
+        throw new Error(
+          `${key} cannot have multiple value, please check your query`,
+        );
+      }
+      const fullQueryString = `${key}${queryVal ? "=" : ""}${queryVal}`;
+      const valArrays = fullQueryString.match(filterRegex);
 
       if (!valArrays) {
         return result;
@@ -88,9 +89,10 @@ function getFilter(
 
       const filterVal: string | string[] = valArrays[3];
       const filterValArray = filterVal.split(","); //TODO: check array
-      //If it already has the key, return. TODO: prevent this later
       if (result[filterKey]) {
-        return result; //TODO: throw exception
+        throw new Error(
+          `${filterKey} cannot have multiple value, please check your query`,
+        );
       }
 
       const toType = dataType != null ? dataType[filterKey] : undefined;
@@ -144,7 +146,6 @@ function getNumberValue(query: StringQuery, keyword: string): number {
     );
   }
 
-  //Only the last skip value takes effect
   const value = Number(queryValue);
   if (!value && queryValue) {
     throw new Error(

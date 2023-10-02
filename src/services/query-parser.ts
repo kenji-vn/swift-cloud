@@ -1,8 +1,10 @@
+/**Parse http query to mongodb query */
 export default function parseQuery(
-  query: StringQuery,
+  query: Record<string, string | string[]>,
   dataType?: Record<string, string>,
-): TaylorQuery {
-  const result: TaylorQuery = {
+): MongoQuery {
+  //TODO: lower case dataType object
+  const result: MongoQuery = {
     limit: getLimit(query),
     skip: getSkip(query),
     sort: getSort(query),
@@ -12,15 +14,13 @@ export default function parseQuery(
   return result;
 }
 
-export type StringQuery = {
-  [key: string]: string | string[];
-};
+export interface StringQuery extends Record<string, string | string[]> {}
 
-export interface TaylorQuery {
+export interface MongoQuery {
   skip: number;
   limit: number;
   sort: Record<string, 1 | -1>;
-  filter: Record<string, any>;
+  filter: Record<string, unknown>;
 }
 
 const filterRegex = /([^><!=]+)([><]=?|!?=|)(.*)/;
@@ -65,12 +65,12 @@ function getSort(query: StringQuery): Record<string, 1 | -1> {
 function getFilter(
   query: StringQuery,
   dataType?: Record<string, string>,
-): Record<string, any> {
+): Record<string, unknown> {
   const keywordsToExclude = Object.values(operatorsKeyword);
 
   const result = Object.keys(query)
     .filter((key) => !keywordsToExclude.includes(key))
-    .reduce<Record<string, any>>((result, key) => {
+    .reduce<Record<string, unknown>>((result, key) => {
       const queryVals = query[key];
       //TODO: handle array with diff key, eg: Author=a,Author!=b --> still a valid query ?
       const singleQueryVal = Array.isArray(queryVals)
@@ -85,11 +85,12 @@ function getFilter(
 
       const filterKey = valArrays[1];
       const filterOp = parseOperator(valArrays[2]);
+
       const filterVal: string | string[] = valArrays[3];
-      const filterValArray = filterVal.split(",");
+      const filterValArray = filterVal.split(","); //TODO: check array
       //If it already has the key, return. TODO: prevent this later
       if (result[filterKey]) {
-        return result;
+        return result; //TODO: throw exception
       }
 
       const toType = dataType != null ? dataType[filterKey] : undefined;

@@ -1,9 +1,40 @@
-import { FastifyPluginAsync } from "fastify";
+import { FastifyPluginAsync, FastifyRequest } from "fastify";
 
-const root: FastifyPluginAsync = async (fastify): Promise<void> => {
-  fastify.get("/", async function (request) {
-    return { message: "Hello world from SwiftCloud" };
+const taylorRoutes: FastifyPluginAsync = async (fastify): Promise<void> => {
+  fastify.get("/", async function () {
+    return { message: "Welcome to SwiftCloud" };
+  });
+
+  fastify.get(
+    "/song",
+    { schema: songSchema },
+    async function (request: FastifyRequest) {
+      const result = await fastify.taylorBot.querySong(
+        request.query as Record<string, string>,
+      );
+      return result;
+    },
+  );
+
+  fastify.get("/album", async function (request: FastifyRequest) {
+    const result = await fastify.taylorBot.queryAlbum(
+      request.query as Record<string, string>,
+    );
+    return result;
   });
 };
 
-export default root;
+const songQueryStringJsonSchema = {
+  type: "object",
+  properties: {
+    sort: { type: "string" },
+    limit: { type: "number" },
+    skip: { type: "number" },
+  },
+};
+
+const songSchema = {
+  querystring: songQueryStringJsonSchema,
+};
+
+export default taylorRoutes;

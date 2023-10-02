@@ -32,7 +32,7 @@ app.listen({ port: Number(process.env.PORT) || 3000 }, (err) => {
 
 const closeListeners = closeWithGrace(
   { delay: Number(process.env.FASTIFY_CLOSE_GRACE_DELAY) || 500 },
-  async function ({ signal, err, manual }) {
+  async function ({ err }) {
     if (err) {
       app.log.error(err);
     }

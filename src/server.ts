@@ -22,6 +22,17 @@ app.addHook("onClose", (instance, done) => {
   done();
 });
 
+app.setErrorHandler((error, request, reply) => {
+  // Throw TaylorParamError as bad request
+  if (error.name === "TaylorParamError") {
+    reply.code(400);
+    reply.send({ message: error.message });
+  } else {
+    // Use the default error handler for other errors
+    reply.send(error);
+  }
+});
+
 //Listen to PORT or default to 3000
 app.listen({ port: Number(process.env.PORT) || 3000 }, (err) => {
   if (err) {

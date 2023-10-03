@@ -93,7 +93,7 @@ function getFilter(
     (result, key) => {
       const queryVal = query[key];
       if (Array.isArray(queryVal)) {
-        throw new Error(
+        throw new TaylorParamError(
           `${key} cannot have multiple value, please check your query`,
         );
       }
@@ -110,7 +110,7 @@ function getFilter(
       const filterVal: string | string[] = valArrays[3];
       const filterValArray = filterVal.split(",");
       if (result[filterKey]) {
-        throw new Error(
+        throw new TaylorParamError(
           `${filterKey} cannot have multiple value, please check your query`,
         );
       }
@@ -140,7 +140,7 @@ function getQuestion(query: StringQuery): MongoQuestion | undefined {
   }
 
   if (Array.isArray(question)) {
-    throw new Error(
+    throw new TaylorParamError(
       `Dupplicated value for ${operatorsKeyword.question}, please check your query`,
     );
   }
@@ -189,14 +189,14 @@ function getNumberValue(
 ): number | undefined {
   const queryValue = query[keyword];
   if (Array.isArray(queryValue)) {
-    throw new Error(
+    throw new TaylorParamError(
       `Dupplicated value for ${keyword}, please check your query`,
     );
   }
 
   const value = Number(queryValue);
   if (!value && queryValue) {
-    throw new Error(
+    throw new TaylorParamError(
       `${keyword} value is not a number, please check your query`,
     );
   }
@@ -216,5 +216,12 @@ function cast(filterVal: string, type?: string) {
 
     default:
       return filterVal;
+  }
+}
+
+class TaylorParamError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "TaylorParamError";
   }
 }

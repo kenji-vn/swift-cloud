@@ -5,16 +5,12 @@ const taylorRoutes: FastifyPluginAsync = async (fastify): Promise<void> => {
     return { message: "Welcome to SwiftCloud" };
   });
 
-  fastify.get(
-    "/song",
-    { schema: songSchema },
-    async function (request: FastifyRequest) {
-      const result = await fastify.taylorBot.querySong(
-        request.query as Record<string, string>,
-      );
-      return result;
-    },
-  );
+  fastify.get("/song", async function (request: FastifyRequest) {
+    const result = await fastify.taylorBot.querySong(
+      request.query as Record<string, string>,
+    );
+    return result;
+  });
 
   fastify.get("/album", async function (request: FastifyRequest) {
     const result = await fastify.taylorBot.queryAlbum(
@@ -22,19 +18,6 @@ const taylorRoutes: FastifyPluginAsync = async (fastify): Promise<void> => {
     );
     return result;
   });
-};
-
-const songQueryStringJsonSchema = {
-  type: "object",
-  properties: {
-    sort: { type: "string" },
-    limit: { type: "number" },
-    skip: { type: "number" },
-  },
-};
-
-const songSchema = {
-  querystring: songQueryStringJsonSchema,
 };
 
 export default taylorRoutes;

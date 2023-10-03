@@ -1,88 +1,122 @@
 import { Db } from "mongodb";
-import parseQuery from "./query-parser.js";
-
-const mongoCollection = "taylorsongs";
-const dbDataTypes = {
-  year: "number",
-  "plays-june": "number",
-  "plays-july": "number",
-  "plays-august": "number",
-  plays: "number",
-};
+import parseQuery, {
+  MongoQuery,
+  MongoQuestion,
+} from "./taylor-query-parser.js";
+import { QuestionStore } from "./taylor-questions.js";
 
 class TaylorQueryService {
-  private mongoDb: Db;
+  private db: Db;
   constructor(db: Db) {
-    this.mongoDb = db;
+    this.db = db;
   }
 
   async querySong(queryString: Record<string, string>) {
-    const query = this.buildQuery(queryString);
-    return await query.toArray();
+    const dbQuery = parseQuery(queryString, queryDataTypes);
+
+    if (!dbQuery.question) {
+      const data = await this.buildQuery(
+        this.db,
+        dbQuery as MongoQuery,
+      ).toArray();
+      return data;
+    } else {
+      const data = await this.getQueryFromQuestionStore(
+        dbQuery.question,
+      )?.toArray();
+      return data;
+    }
   }
 
   async queryAlbum(queryString: Record<string, string>) {
-    const query = this.buildAlbumQuery(queryString);
-    const albums = await query.toArray();
-    return albums;
+    const dbQuery = parseQuery(queryString, queryDataTypes);
+
+    const query = dbQuery.sort
+      ? this.getAlbumGroupByQuery(dbQuery)
+      : this.buildQuery(this.db, dbQuery).project({
+          _id: 0,
+          album: "$album",
+        });
+    return await query.toArray();
   }
 
-  private buildQuery(queryString: Record<string, string>) {
-    const { filter, sort, skip, limit } = parseQuery(queryString, dbDataTypes);
-
-    const filterWithRegex = this.getSupportedRegex(filter);
-    let query = this.mongoDb
+  private buildQuery(db: Db, dbQuery: MongoQuery) {
+    const query = db
       .collection(mongoCollection)
-      .find(filterWithRegex)
-      .collation({ locale: "en", strength: 2 }) //case insensitive
-      .sort(sort);
+      .find(dbQuery.filter ?? {})
+      .collation(queryCollation)
+      .sort(dbQuery.sort ?? {});
 
-    if (skip) {
-      query = query.skip(skip);
+    if (dbQuery.skip) {
+      query.skip(dbQuery.skip);
     }
-    if (limit) {
-      query = query.limit(limit);
+    if (dbQuery.limit) {
+      query.limit(dbQuery.limit);
     }
     return query;
   }
 
-  private buildAlbumQuery(queryString: Record<string, string>) {
-    const { sort } = parseQuery(queryString, dbDataTypes);
-    const albumSumValue = Object.keys(sort)[0];
+  private getQueryFromQuestionStore(question: MongoQuestion) {
+    const selectedQuestion = QuestionStore[question.value]();
 
-    let query = this.mongoDb
-      .collection(mongoCollection)
-      .aggregate([
+    if (selectedQuestion.aggregate) {
+      return this.db
+        .collection(mongoCollection)
+        .aggregate(selectedQuestion.aggregate);
+    } else if (selectedQuestion.filter) {
+      return this.buildQuery(this.db, selectedQuestion);
+    }
+  }
+
+  private getAlbumGroupByQuery(dbQuery: MongoQuery) {
+    const { filter, sort, skip, limit } = dbQuery;
+
+    const albumSortValue = Object.keys(sort!)[0];
+
+    const query = this.db.collection(mongoCollection).aggregate(
+      [
+        {
+          $match: filter,
+        },
         {
           $group: {
             _id: "$album",
-            plays: {
-              $sum: `$${albumSumValue}`,
+            [albumSortValue]: {
+              $sum: `$${albumSortValue}`,
             },
           },
         },
-      ])
-      .sort(sort);
+        {
+          $sort: sort,
+        },
+        {
+          $project: {
+            _id: 0,
+            album: "$_id",
+            [albumSortValue]: 1,
+          },
+        },
+      ],
+      {
+        collation: queryCollation,
+      },
+    );
+
+    if (skip) {
+      query.skip(skip);
+    }
+    if (limit) {
+      query.limit(limit);
+    }
 
     return query;
   }
-
-  /**Regex is disabled for all filters, except for searching by song name.
-   * Only /^song/ is supported for now, because it is fast and helful for this simple project
-   */
-  private getSupportedRegex(
-    filter: Record<string, unknown>,
-  ): Record<string, unknown> {
-    const songFilter = filter["song"] as Record<string, unknown>;
-    const eqValue = songFilter ? (songFilter["$eq"] as string) : undefined;
-    if (eqValue && eqValue[eqValue.length - 1] === "%")
-      filter["song"] = {
-        $regex: `^${eqValue.substring(0, eqValue.length - 1)}`,
-        $options: "i",
-      };
-
-    return filter;
-  }
 }
+
+const mongoCollection = "taylorsongs";
+const queryCollation = { locale: "en", strength: 2 }; //case insensitive
+const queryDataTypes = {
+  year: "number",
+};
 
 export default TaylorQueryService;

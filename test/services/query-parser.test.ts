@@ -1,7 +1,9 @@
 import { test } from "tap";
 import querystring from "node:querystring";
 
-import parseQuery, { StringQuery } from "../../src/services/query-parser.js";
+import parseQuery, {
+  StringQuery,
+} from "../../src/services/taylor-query-parser.js";
 
 /* Testing sort keyword */
 test("Query with more than 1 sort param, parse correctly", async (t) => {
@@ -66,6 +68,14 @@ test("Query with dupplicate skip param, throw exception", async (t) => {
   );
 });
 
+test("Query with no skip value, parse correctly", async (t) => {
+  const query = createQuery("sort=somefield");
+
+  const result = parseQuery(query as StringQuery);
+
+  t.strictSame(result.skip, undefined);
+});
+
 /* Testing limit keyword */
 test("Query with 1 limit value, parse correctly", async (t) => {
   const query = createQuery("limit=15");
@@ -97,6 +107,14 @@ test("Query with dupplicate limit param, throw exception", async (t) => {
     new Error("Dupplicated value for limit, please check your query"),
     "should throw error for dupplicated limit value",
   );
+});
+
+test("Query with no limit value, parse corectly", async (t) => {
+  const query = createQuery("sort=somefield");
+
+  const result = parseQuery(query as StringQuery);
+
+  t.strictSame(result.limit, undefined);
 });
 
 /* Testing filter keyword */

@@ -19,20 +19,20 @@ test("Query with more than 1 sort param, parse correctly", async (t) => {
   });
 });
 
-test("Query with no sort param, parse correctly", async (t) => {
+test("Query with no sort param, parse correctly to undefined", async (t) => {
   const query = createQuery("album=Test");
 
   const result = parseQuery(query as StringQuery);
 
-  t.strictSame(result.sort, {});
+  t.strictSame(result.sort, undefined);
 });
 
-test("Query with empty sort param, parse correctly", async (t) => {
+test("Query with empty sort param, parse correctly to undefined", async (t) => {
   const query = createQuery("album=Test&sort");
 
   const result = parseQuery(query as StringQuery);
 
-  t.strictSame(result.sort, {});
+  t.strictSame(result.sort, undefined);
 });
 
 /* Testing skip keyword */

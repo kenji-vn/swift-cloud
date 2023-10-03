@@ -41,6 +41,8 @@
     "eslint-plugin-n": "^16.1.0",
     "eslint-plugin-promise": "^6.1.1",
     "fastify-tsconfig": "^1.0.1",
+    "mongodb": "^6.1.0",
+    "mongodb-memory-server": "^8.15.1",
     "prettier": "3.0.3",
     "tap": "^16.1.0",
     "ts-node": "^10.4.0",

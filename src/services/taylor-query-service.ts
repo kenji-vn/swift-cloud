@@ -11,8 +11,8 @@ class TaylorQueryService {
     this.db = db;
   }
 
-  async querySong(queryString: Record<string, string>) {
-    const dbQuery = parseQuery(queryString, queryDataTypes);
+  async querySong(query: Record<string, string>) {
+    const dbQuery = parseQuery(query, queryDataTypes);
 
     if (!dbQuery.question) {
       const data = await this.buildQuery(
@@ -57,7 +57,9 @@ class TaylorQueryService {
   }
 
   private getQueryFromQuestionStore(question: MongoQuestion) {
-    const selectedQuestion = QuestionStore[question.value]();
+    const selectedQuestion = question.param
+      ? QuestionStore[question.value](question.param)
+      : QuestionStore[question.value]();
 
     if (selectedQuestion.aggregate) {
       return this.db
@@ -117,6 +119,10 @@ const mongoCollection = "taylorsongs";
 const queryCollation = { locale: "en", strength: 2 }; //case insensitive
 const queryDataTypes = {
   year: "number",
+  "plays-june": "number",
+  "plays-july": "number",
+  "plays-august": "number",
+  plays: "number",
 };
 
 export default TaylorQueryService;

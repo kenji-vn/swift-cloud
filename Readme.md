@@ -37,15 +37,15 @@ There are 2 endpoints:
 
     * song, artist, writer, album, year: data field of the song.
     * plays-june, plays-july , plays-august , plays:  play counts in each month, with "plays" is the total play counts of all time.
-    * Example: /song?album=folklore,artist=Taylor%20Swift
+    * Example: `/song?album=folklore,artist=Taylor%20Swift`
 
 * Beside "=", you can use !=, >, >=, <, <=
-    * Example: /song?year>=2015&album=folklore,Fearless&plays>=100
+    * Example: `/song?year>=2015&album=folklore,Fearless&plays>=100`
         - This queries all song with year >= 2015, in album Folklore and album Fearless, with total play counts >= 100
 * You can also use these keywords: sort, skip, limit
-    * Example: /song?year>=2015&sort=-plays&limit=5
+    * Example: `/song?year>=2015&sort=-plays&limit=5`
         - This queries top 5 songs, sort by "plays" descending (- for descending, default is ascending) and year >=2015
-    * You can sort with more than 1 field: sort=-plays,song
+    * You can sort with more than 1 field: `sort=-plays,song`
         - Sort by plays descending, then by song name ascending
     * skip and limit are optional, but appear max 1 time in the query
 * No regex support for the params
@@ -53,46 +53,46 @@ There are 2 endpoints:
     * Question is a built-in query in server side, API consumers just need to provide the question, and maybe params of the question.
     * This feature is to demo the idea that complex queries and maybe-not-safe regex should be checked and put on the server.
     * This API has 2 built in Question
-        - /song?question=title(You)
+        - `/song?question=title(You)`
             + Query all songs that have name start with the word "You"
-        - /song?trending&limit=5
+        - `/song?trending&limit=5`
             + Query Top 5 trending songs in August. Trending is calculated by plays-august subtract plays-july
 
 ### Technical notes
 
 - API is built with TypeScript and Fastify framework
 - Fastify framework has an interesting plugins system, check it here: [The hitchhiker's guide to plugins](https://www.fastify.io/docs/latest/Guides/Plugins-Guide/)
-- Main logic of this API is called with the plugin taylor-bot.ts
+- Main logic of this API is called with the plugin `taylor-bot.ts`
 - Data is put in a MongoDb database, where it can be queried by the schema and keywords described in the API usage section.
 - My personal goal is to make the API params easy to read, easy to support complex queries but not to expose the powerful regex to the clients.
 
 - The main code files:
-    - src/services/taylor-query-parser.ts
+    - `src/services/taylor-query-parser.ts`
         - This converts API query params to a DB query object to use with Mongo DB. Support these operators: =,!=, >, >=, <, <= and also support the **Question** feature.
-    - src/services/taylor-query-service.ts
+    - `src/services/taylor-query-service.ts`
         - Main service to query MongoDb, with the provided DB query from the parser.
         - Support query song, query album (Aggregation with MongoDb), Question
-    - src/services/taylor-questions.ts
+    - `src/services/taylor-questions.ts`
         - 2 Mongo db queries preset: title(regex) and trending
-    - src/routes/swift-cloud.ts
+    - `src/routes/swift-cloud.ts`
         - All routes of the API
-    - src/plugins/taylor-bot.ts
+    - `src/plugins/taylor-bot.ts`
         - Plugin for Fastify, using taylor-query-service.ts
-    - src/plugins/db-connector.ts
+    - `src/plugins/db-connector.ts`
         - MongoDb setup, for both local and the one on https://swiftcloud.fly.dev
         - For demo purpose, connection string and password are hardcoded here, the user has read-only permission.
-    - data-scripts
+    - `data-scripts`
         - Just for reference purpose, no need for running this project on local
-    - test/services
+    - `test/services`
         - Unit tests for this project
         - For testing taylor-query-service.ts, this project uses "mongodb-memory-server"
-- This app 
-### Local setup
+### Local setup guide
 
 - The machine should have Nodejs (18 or 20)
-- To build
+1. To install all dependencies: `npm install`
+2. To build
     `npm run build`
-- To start the local server
+3. To start the local server
     `npm run start`
 - In order to build and then start, run
     `npm run dstart`

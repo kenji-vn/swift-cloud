@@ -23,6 +23,7 @@ Here are some interesting facts about Taylor Swift songs you can query:
 - Top 3 album, sort by total plays
     * https://swiftcloud.fly.dev/album?sort=-plays&limit=3
 
+Check the Postman collection in this project for more.
 
 ### API usage
 Swagger: https://swiftcloud.fly.dev/docs/static/index.html
@@ -86,7 +87,8 @@ There are 2 endpoints:
     - `test/services`
         - Unit tests for this project
         - For testing taylor-query-service.ts, this project uses "mongodb-memory-server"
-### Local setup guide
+
+### Local setup
 
 - The machine should have Nodejs (18 or 20)
 1. To install all dependencies: `npm install`

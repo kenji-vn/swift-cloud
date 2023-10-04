@@ -9,7 +9,6 @@ export default class TaylorQuestions {
           $options: "i",
         },
       },
-      sort: {},
     };
   }
 
@@ -18,13 +17,11 @@ export default class TaylorQuestions {
       aggregate: [
         {
           $addFields: {
-            trend: { $subtract: ["$plays-august", "$plays-june"] },
+            trend: { $subtract: ["$plays-august", "$plays-july"] },
           },
         },
         { $sort: { trend: -1 } },
       ],
-      filter: {},
-      sort: {},
     };
   }
 }

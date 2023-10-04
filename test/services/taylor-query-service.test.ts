@@ -139,7 +139,7 @@ t.test(
 
 //#region testing query song with question feature
 t.test(
-  "query Song with question, title, should return correct result",
+  "query Song with question: title, should return correct result",
   async (t) => {
     const queryService = new TaylorQueryService(mongoDb!);
     const query = {
@@ -148,6 +148,43 @@ t.test(
     const result = await queryService.querySong(query);
     const songsInResult = result?.map((r) => r["song"] as string);
     t.strictSame(songsInResult, ["songsong 8"]);
+  },
+);
+
+t.test(
+  "query Song with question: trending, should return correct result",
+  async (t) => {
+    const queryService = new TaylorQueryService(mongoDb!);
+    const query = {
+      question: "trending",
+      limit: "5",
+    };
+    const result = await queryService.querySong(query);
+    const songsInResult = result?.map((r) => {
+      return { song: r["song"] as string, trend: r["trend"] as number };
+    });
+    t.strictSame(songsInResult, [
+      {
+        song: "song 1",
+        trend: 17,
+      },
+      {
+        song: "song 7",
+        trend: 15,
+      },
+      {
+        song: "song 2",
+        trend: 6,
+      },
+      {
+        song: "song 3",
+        trend: 6,
+      },
+      {
+        song: "song 5",
+        trend: 5,
+      },
+    ]);
   },
 );
 //#endregion
@@ -166,10 +203,43 @@ t.test(
       {
         album: "album 4",
         plays: 85,
+        song: 1,
       },
       {
         album: "album 5",
         plays: 69,
+        song: 2,
+      },
+    ]);
+  },
+);
+
+t.test(
+  "query album with no sort by, should return correct list of albums sort by number of songs",
+  async (t) => {
+    const queryService = new TaylorQueryService(mongoDb!);
+    const query = {};
+    const result = await queryService.queryAlbum(query);
+    t.strictSame(result, [
+      {
+        album: "album 3",
+        song: 1,
+      },
+      {
+        album: "album 4",
+        song: 1,
+      },
+      {
+        album: "album 2",
+        song: 2,
+      },
+      {
+        album: "album 5",
+        song: 2,
+      },
+      {
+        album: "album 1",
+        song: 3,
       },
     ]);
   },

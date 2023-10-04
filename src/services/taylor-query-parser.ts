@@ -83,7 +83,7 @@ function getFilter(
   const keywordsToExclude = Object.values(operatorsKeyword);
 
   const filterValues = Object.keys(query).filter(
-    (key) => !keywordsToExclude.includes(key),
+    (key) => !keywordsToExclude.includes(key.trim()),
   );
   if (filterValues.length == 0) {
     return undefined;
@@ -97,14 +97,14 @@ function getFilter(
           `${key} cannot have multiple value, please check your query`,
         );
       }
-      const fullQueryString = `${key}${queryVal ? "=" : ""}${queryVal}`;
+      const fullQueryString = `${key.trim()}${queryVal ? "=" : ""}${queryVal}`;
       const valArrays = fullQueryString.match(filterRegex);
 
       if (!valArrays) {
         return result;
       }
 
-      const filterKey = valArrays[1];
+      const filterKey = valArrays[1].trim();
       const filterOp = parseOperator(valArrays[2]);
 
       const filterVal: string | string[] = valArrays[3];
@@ -120,10 +120,10 @@ function getFilter(
         filterValArray.length > 1
           ? {
               [filterOp == "$eq" ? "$in" : "$nin"]: filterValArray.map((val) =>
-                cast(val, toType),
+                cast(val.trim(), toType),
               ),
             }
-          : { [filterOp]: cast(filterVal, toType) };
+          : { [filterOp]: cast(filterVal.trim(), toType) };
 
       return result;
     },

@@ -1,8 +1,5 @@
 import { Db } from "mongodb";
-import parseQuery, {
-  MongoQuery,
-  MongoQuestion,
-} from "./taylor-query-parser.js";
+import parseQuery, { MongoQuery, TaylorQuery } from "./taylor-query-parser.js";
 import { QuestionStore } from "./taylor-questions.js";
 
 class TaylorQueryService {
@@ -14,16 +11,11 @@ class TaylorQueryService {
   async querySong(query: Record<string, string>) {
     const dbQuery = parseQuery(query, queryDataTypes);
 
-    if (!dbQuery.question) {
-      const data = await this.buildQuery(
-        this.db,
-        dbQuery as MongoQuery,
-      ).toArray();
+    if (dbQuery.question) {
+      const data = await this.getQueryFromQuestionStore(dbQuery)?.toArray();
       return data;
     } else {
-      const data = await this.getQueryFromQuestionStore(
-        dbQuery.question,
-      )?.toArray();
+      const data = await this.buildQuery(dbQuery as MongoQuery).toArray();
       return data;
     }
   }
@@ -31,17 +23,12 @@ class TaylorQueryService {
   async queryAlbum(queryString: Record<string, string>) {
     const dbQuery = parseQuery(queryString, queryDataTypes);
 
-    const query = dbQuery.sort
-      ? this.getAlbumGroupByQuery(dbQuery)
-      : this.buildQuery(this.db, dbQuery).project({
-          _id: 0,
-          album: "$album",
-        });
+    const query = this.getAlbumGroupByQuery(dbQuery);
     return await query.toArray();
   }
 
-  private buildQuery(db: Db, dbQuery: MongoQuery) {
-    const query = db
+  private buildQuery(dbQuery: MongoQuery) {
+    const query = this.db
       .collection(mongoCollection)
       .find(dbQuery.filter ?? {})
       .collation(queryCollation)
@@ -56,35 +43,51 @@ class TaylorQueryService {
     return query;
   }
 
-  private getQueryFromQuestionStore(question: MongoQuestion) {
+  private getQueryFromQuestionStore(dbQuery: TaylorQuery) {
+    const question = dbQuery.question;
+    if (!question) {
+      return undefined;
+    }
+
     const selectedQuestion = question.param
       ? QuestionStore[question.value](question.param)
       : QuestionStore[question.value]();
 
     if (selectedQuestion.aggregate) {
-      return this.db
+      const query = this.db
         .collection(mongoCollection)
-        .aggregate(selectedQuestion.aggregate);
+        .aggregate(selectedQuestion.aggregate, {
+          collation: queryCollation,
+        });
+      if (dbQuery.skip) {
+        query.skip(dbQuery.skip);
+      }
+      if (dbQuery.limit) {
+        query.limit(dbQuery.limit);
+      }
+      return query;
     } else if (selectedQuestion.filter) {
-      return this.buildQuery(this.db, selectedQuestion);
+      return this.buildQuery(selectedQuestion);
     }
   }
 
   private getAlbumGroupByQuery(dbQuery: MongoQuery) {
-    const { filter, sort, skip, limit } = dbQuery;
-
-    const albumSortValue = Object.keys(sort!)[0];
+    const sort = dbQuery.sort ?? { song: 1, _id: 1 };
+    const albumSortValue = sort ? Object.keys(sort)[0] : "song";
 
     const query = this.db.collection(mongoCollection).aggregate(
       [
         {
-          $match: filter,
+          $match: dbQuery.filter ?? {},
         },
         {
           $group: {
             _id: "$album",
             [albumSortValue]: {
               $sum: `$${albumSortValue}`,
+            },
+            song: {
+              $count: {},
             },
           },
         },
@@ -95,6 +98,7 @@ class TaylorQueryService {
           $project: {
             _id: 0,
             album: "$_id",
+            song: "$song",
             [albumSortValue]: 1,
           },
         },
@@ -104,11 +108,11 @@ class TaylorQueryService {
       },
     );
 
-    if (skip) {
-      query.skip(skip);
+    if (dbQuery.skip) {
+      query.skip(dbQuery.skip);
     }
-    if (limit) {
-      query.limit(limit);
+    if (dbQuery.limit) {
+      query.limit(dbQuery.limit);
     }
 
     return query;

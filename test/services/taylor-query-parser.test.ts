@@ -120,7 +120,7 @@ test("Query with no limit value, parse corectly", async (t) => {
 /* Testing filter keyword */
 test("Query with filter using all operators with different cases, parse correctly", async (t) => {
   const query = createQuery(
-    "Field1=value1&Field2!=Value1&Field3>100&field4>=200&field5<300&field6<=400&field7=VAL1,val2&field8!=val1,val2",
+    "Field1=value1&Field2! =Value1&Field3 >100&field4>= 200&field5<300&field6<=400&field7=VAL1,val2&field8!=val1,val2",
   );
 
   const result = parseQuery(query as StringQuery);

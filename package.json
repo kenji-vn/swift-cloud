@@ -9,12 +9,12 @@
   },
   "scripts": {
     "test": "npm run build && tsc -p test/tsconfig.json && c8 tap --ts \"test/**/*.test.ts\"",
-    "start": "npm run build && Node dist/server.js",
+    "start": "node dist/server.js",
+    "dstart": "npm run build && node dist/server.js",
     "build": "tsc",
     "lint": "eslint .",
     "watch": "tsc -w",
     "dev": "npm run build && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"npm:watch\" \"npm:dev:start\"",
-    "dev:start-old": "fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js",
     "dev:start": "node --watch dist/server.js"
   },
   "keywords": [],
@@ -26,7 +26,8 @@
     "@fastify/sensible": "^5.0.0",
     "fastify": "^4.0.0",
     "fastify-cli": "^5.8.0",
-    "fastify-plugin": "^4.0.0"
+    "fastify-plugin": "^4.0.0",
+    "typescript": "^4.9.5"
   },
   "devDependencies": {
     "@types/node": "^20.4.4",
@@ -45,8 +46,7 @@
     "mongodb-memory-server": "^8.15.1",
     "prettier": "3.0.3",
     "tap": "^16.1.0",
-    "ts-node": "^10.4.0",
-    "typescript": "^4.9.5"
+    "ts-node": "^10.4.0"
   },
   "tap": {
     "node-arg": [

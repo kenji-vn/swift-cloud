@@ -34,12 +34,15 @@ app.setErrorHandler((error, request, reply) => {
 });
 
 //Listen to PORT or default to 3000
-app.listen({ port: Number(process.env.PORT) || 3000 }, (err) => {
-  if (err) {
-    app.log.error(err);
-    process.exit(1);
-  }
-});
+app.listen(
+  { port: Number(process.env.PORT) || 3000, host: "0.0.0.0" },
+  (err) => {
+    if (err) {
+      app.log.error(err);
+      process.exit(1);
+    }
+  },
+);
 
 const closeListeners = closeWithGrace(
   { delay: Number(process.env.FASTIFY_CLOSE_GRACE_DELAY) || 500 },

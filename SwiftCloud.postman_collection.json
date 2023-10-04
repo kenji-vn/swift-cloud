@@ -1,0 +1,335 @@
+{
+	"info": {
+		"_postman_id": "eee2bea6-2010-44b8-99a1-5843cff19003",
+		"name": "SwiftCloud",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7149152"
+	},
+	"item": [
+		{
+			"name": "song",
+			"item": [
+				{
+					"name": "Top 20 song all time, by total plays",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/song?limit=20&sort=-plays,song",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"song"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "sort",
+									"value": "-plays,song"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Top 5 most played songs in August",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/song?limit=5&sort=-plays-august,song",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"song"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "5"
+								},
+								{
+									"key": "sort",
+									"value": "-plays-august,song"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All songs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/song",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"song"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All songs, with title start with the word You",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/song?question=title(You)",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"song"
+							],
+							"query": [
+								{
+									"key": "question",
+									"value": "title(You)"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Top 5 trending songs in August",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/song?question=trending&limit=5",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"song"
+							],
+							"query": [
+								{
+									"key": "question",
+									"value": "trending"
+								},
+								{
+									"key": "limit",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All songs in an album",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/song?album=sounds%20of%20the%20Season",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"song"
+							],
+							"query": [
+								{
+									"key": "album",
+									"value": "sounds%20of%20the%20Season"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All songs in the year 2015,2016,2017 order by total play all time",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/song?year=2015,2016,2017&sort=-plays",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"song"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2015,2016,2017"
+								},
+								{
+									"key": "sort",
+									"value": "-plays"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "most popular song all time",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/song?limit=1&sort=-plays",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"song"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "1"
+								},
+								{
+									"key": "sort",
+									"value": "-plays"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "dupplicate params, return error",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/song?sort=-plays,song&limit=3&limit=5",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"song"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "-plays,song"
+								},
+								{
+									"key": "limit",
+									"value": "3"
+								},
+								{
+									"key": "limit",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "album",
+			"item": [
+				{
+					"name": "All album",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/album",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"album"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All album, sort by total plays",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/album?sort=-plays&limit=3",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"album"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "-plays"
+								},
+								{
+									"key": "limit",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "root",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000"
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "https://swiftcloud.fly.dev"
+		}
+	]
+}

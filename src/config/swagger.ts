@@ -1,13 +1,12 @@
 export const swaggerOptions = {
   swagger: {
     info: {
-      title: "Fastify API",
-      description:
-        "Building a blazing fast REST API with Node.js, MongoDB, Fastify and Swagger",
-      version: "1.0.0",
+      title: "SwiftCloud",
+      description: "Ask anything about Taylor Swift songs",
+      version: "0.1.0",
     },
     externalDocs: {
-      url: "https://swagger.io",
+      url: "https://github.com/kenji-vn/swift-cloud",
       description: "Find more info here",
     },
     host: "swiftcloud.fly.dev",

@@ -36,7 +36,7 @@ test("Query with empty sort param, parse correctly to undefined", async (t) => {
 });
 
 /* Testing skip keyword */
-test("Query with 1 skip value, parse correctly", async (t) => {
+test("Query with 1 skip value, parse correctly to a number", async (t) => {
   const query = createQuery("skip=15");
 
   const result = parseQuery(query as StringQuery);
@@ -68,7 +68,7 @@ test("Query with dupplicate skip param, throw exception", async (t) => {
   );
 });
 
-test("Query with no skip value, parse correctly", async (t) => {
+test("Query with no skip value, parse correctly to undefined", async (t) => {
   const query = createQuery("sort=somefield");
 
   const result = parseQuery(query as StringQuery);
@@ -77,7 +77,7 @@ test("Query with no skip value, parse correctly", async (t) => {
 });
 
 /* Testing limit keyword */
-test("Query with 1 limit value, parse correctly", async (t) => {
+test("Query with 1 limit value, parse correctly to a number", async (t) => {
   const query = createQuery("limit=15");
 
   const result = parseQuery(query as StringQuery);
@@ -109,7 +109,7 @@ test("Query with dupplicate limit param, throw exception", async (t) => {
   );
 });
 
-test("Query with no limit value, parse corectly", async (t) => {
+test("Query with no limit value, parse corectly to undefined", async (t) => {
   const query = createQuery("sort=somefield");
 
   const result = parseQuery(query as StringQuery);
@@ -118,7 +118,7 @@ test("Query with no limit value, parse corectly", async (t) => {
 });
 
 /* Testing filter keyword */
-test("Query with filter using all operators with different cases, parse correctly", async (t) => {
+test("Query with filter using all operators with different cases and spaces in params, parse correctly", async (t) => {
   const query = createQuery(
     "Field1=value1&Field2! =Value1&Field3 >100&field4>= 200&field5<300&field6<=400&field7=VAL1,val2&field8!=val1,val2",
   );
@@ -153,7 +153,7 @@ test("Query with filter using all operators with different cases, parse correctl
   });
 });
 
-test("Query with filter with same key params, parse correctly", async (t) => {
+test("Query with filter with 2 same key params, throw exception", async (t) => {
   const query = createQuery("Field1=value1&Field1=value3");
 
   t.throws(
@@ -165,7 +165,7 @@ test("Query with filter with same key params, parse correctly", async (t) => {
   );
 });
 
-test("Query with filter with same key params scenario2, parse correctly", async (t) => {
+test("Query with filter with 3 same key params, throw exception", async (t) => {
   const query = createQuery("Field1=value1&field1>=100&Field1<10");
 
   t.throws(
@@ -181,8 +181,12 @@ test("Query with filter with same key params scenario2, parse correctly", async 
 /* Testing data casting */
 
 /* helper functions */
-//node:querystring is what Fastify uses to parse query string
+
+/**
+ * Creates query to test the TaylorQueryParser
+ */
 function createQuery(queryString: string) {
+  //node:querystring.toLowerCase() is what we config Fastify to for query parsing
   const query = querystring.decode(queryString.toLowerCase());
   return query;
 }

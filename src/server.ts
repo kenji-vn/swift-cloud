@@ -23,7 +23,7 @@ app.addHook("onClose", (instance, done) => {
 });
 
 app.setErrorHandler((error, request, reply) => {
-  // Throw TaylorParamError as bad request
+  // Throw TaylorParamError as bad request 400
   if (error.name === "TaylorParamError") {
     reply.code(400);
     reply.send({ message: error.message });

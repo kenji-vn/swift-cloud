@@ -1,5 +1,5 @@
 import { Db } from "mongodb";
-import parseQuery, { MongoQuery, TaylorQuery } from "./taylor-query-parser.js";
+import parseQuery, { MongoQuery, DbQuery } from "./taylor-query-parser.js";
 import { QuestionStore } from "./taylor-questions.js";
 
 class TaylorQueryService {
@@ -9,13 +9,16 @@ class TaylorQueryService {
   }
 
   async querySong(query: Record<string, string>) {
+    //Convert query params to mongo db query object
     const dbQuery = parseQuery(query, queryDataTypes);
 
     if (dbQuery.question) {
-      const data = await this.getQueryFromQuestionStore(dbQuery)?.toArray();
+      //If it uses question feature, load data from prebuilt queries in taylor-questions.ts
+      const data = await this.buildQueryFromQuestionStore(dbQuery)?.toArray();
       return data;
     } else {
-      const data = await this.buildQuery(dbQuery as MongoQuery).toArray();
+      //Load data from mongo db with the provided query
+      const data = await this.buildQuery(dbQuery).toArray();
       return data;
     }
   }
@@ -23,11 +26,11 @@ class TaylorQueryService {
   async queryAlbum(queryString: Record<string, string>) {
     const dbQuery = parseQuery(queryString, queryDataTypes);
 
-    const query = this.getAlbumGroupByQuery(dbQuery);
+    const query = this.buildAlbumGroupByQuery(dbQuery);
     return await query.toArray();
   }
 
-  private buildQuery(dbQuery: MongoQuery) {
+  private buildQuery(dbQuery: DbQuery) {
     const query = this.db
       .collection(mongoCollection)
       .find(dbQuery.filter ?? {})
@@ -43,7 +46,12 @@ class TaylorQueryService {
     return query;
   }
 
-  private getQueryFromQuestionStore(dbQuery: TaylorQuery) {
+  /**
+   * Get prebuilt queries in QuestionStore.
+   * For complex queries and queries with regex, we want to stored them in server.
+   * Api consumers just need to call the question, no need to provide complex and maybe bad performance params.
+   */
+  private buildQueryFromQuestionStore(dbQuery: DbQuery) {
     const question = dbQuery.question;
     if (!question) {
       return undefined;
@@ -71,7 +79,10 @@ class TaylorQueryService {
     }
   }
 
-  private getAlbumGroupByQuery(dbQuery: MongoQuery) {
+  /**
+   * Get album data from songs database, by query songs table with group by "album" field
+   */
+  private buildAlbumGroupByQuery(dbQuery: MongoQuery) {
     const sort = dbQuery.sort ?? { song: 1, _id: 1 };
     const albumSortValue = sort ? Object.keys(sort)[0] : "song";
 

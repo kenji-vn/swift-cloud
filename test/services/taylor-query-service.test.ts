@@ -7,6 +7,10 @@ let mongoDb: Db | undefined = undefined;
 let mongoClient: MongoClient | undefined = undefined;
 let mongoServer: MongoMemoryServer | undefined;
 
+/**
+ * This unit test file uses mongodb-in-memory to test the TaylorQueryService
+ * This before() function runs once before any tests are ran, and set up mongodb with our test data.
+ */
 t.before(async () => {
   mongoServer = await MongoMemoryServer.create();
 
@@ -19,32 +23,32 @@ t.before(async () => {
   await collection.insertMany(testData);
 });
 
+/**
+ * Close mongodb when all tests are done
+ */
 t.teardown(async () => {
   await mongoClient?.close();
   await mongoServer?.stop();
 });
 
 //#region testing query songs with filter, sort, limit and skip
-t.test(
-  "querySong with no filter for all songs, should return correct result",
-  async (t) => {
-    const queryService = new TaylorQueryService(mongoDb!);
-    const query = {};
-    const result = await queryService.querySong(query);
-    const songsInResult = result?.map((r) => r["song"] as string);
-    t.strictSame(songsInResult, [
-      "song 1",
-      "song 2",
-      "song 3",
-      "song 4",
-      "song 5",
-      "song 6",
-      "song 7",
-      "songsong 8",
-      "song 9",
-    ]);
-  },
-);
+t.test("querySong with no filter, should return all songs", async (t) => {
+  const queryService = new TaylorQueryService(mongoDb!);
+  const query = {};
+  const result = await queryService.querySong(query);
+  const songsInResult = result?.map((r) => r["song"] as string);
+  t.strictSame(songsInResult, [
+    "song 1",
+    "song 2",
+    "song 3",
+    "song 4",
+    "song 5",
+    "song 6",
+    "song 7",
+    "songsong 8",
+    "song 9",
+  ]);
+});
 
 t.test(
   "querySong with no filter, with skip and no limit, should return correct result",
@@ -246,6 +250,7 @@ t.test(
 );
 //#endregion
 
+// 9 songs with different values
 const testData = [
   {
     song: "song 1",

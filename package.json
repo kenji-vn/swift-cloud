@@ -9,6 +9,7 @@
   },
   "scripts": {
     "test": "npm run build && tsc -p test/tsconfig.json && c8 tap --ts \"test/**/*.test.ts\"",
+    "ubuntu22-test": "npm run build && tsc -p test/tsconfig.json && c8 cross-env MONGOMS_VERSION=6.0.4 tap --ts  \"test/**/*.test.ts\"",
     "start": "node dist/server.js",
     "dstart": "npm run build && node dist/server.js",
     "build": "tsc",
@@ -37,6 +38,7 @@
     "@typescript-eslint/eslint-plugin": "^6.7.3",
     "c8": "^7.13.0",
     "concurrently": "^7.0.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.50.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-config-standard-with-typescript": "^39.1.0",

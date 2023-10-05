@@ -53,7 +53,7 @@ There are 2 endpoints:
 * For complex queries or queries need regex, you can use the **Question** feature
     * Question is a built-in query in server side, API consumers just need to provide the question, and maybe params of the question.
     * This feature is to demo the idea that complex queries and maybe-not-safe regex should be checked and put on the server.
-    * This API has 2 built in Question
+    * This API has 2 built in Questions
         - `/song?question=title(You)`
             + Query all songs that have name start with the word "You"
         - `/song?trending&limit=5`
@@ -84,9 +84,9 @@ There are 2 endpoints:
         - For demo purpose, connection string and password are hardcoded here, the user has read-only permission.
     - `data-scripts`
         - Just for reference purpose, no need for running this project on local
-    - `test/services`
-        - Unit tests for this project
-        - For testing taylor-query-service.ts, this project uses "mongodb-memory-server"
+    - **Unit tests**
+        - In `test`
+        - For testing `taylor-query-service.ts`, this project uses `mongodb-memory-server`, the first run it might take some time to download the binary.
 
 ### Local setup
 
@@ -96,10 +96,15 @@ There are 2 endpoints:
     `npm run build`
 3. To start the local server
     `npm run start`
+    
+    http://localhost:3000/
 - In order to build and then start, run
     `npm run dstart`
 - To run test
     `npm run test`
+    - There is a [current issue with mongodb-memory-server on Ubuntu 22](https://github.com/nodkz/mongodb-memory-server/issues/732) , if you are using Ubuntu 22 please run:
+
+    `npm run ubuntu22-test`
 - To enforce coding standard
     `npm run lint`
 
